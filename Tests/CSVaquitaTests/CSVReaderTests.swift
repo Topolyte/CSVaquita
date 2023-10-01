@@ -291,6 +291,34 @@ final class csvaquitaTests: XCTestCase {
         let rows = try readAll(reader)
         XCTAssertEqual(expected, rows)
     }
+    
+    func testForIn() throws {
+        let s = """
+        id,country,capital,population,GDP
+        1,United Kindom,London,67508936,$3158bn
+        2,United States,Washington,338289857,
+        """
+
+        let reader = try CSVReader(makeStream(s))
+        
+        var rows = [[String]]()
+        
+        for result in reader {
+            switch result {
+            case let .success(row):
+                rows.append(row)
+            case let .failure(error):
+                throw error
+            }
+        }
+        
+        let expected = [
+            ["1","United Kindom","London","67508936","$3158bn"],
+            ["2","United States","Washington","338289857",""]
+        ]
+
+        XCTAssertEqual(expected, rows)
+    }
 
     func testAdHoc() throws {
         let s = """

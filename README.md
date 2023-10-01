@@ -56,7 +56,18 @@ while let row = try reader.readRow() {
     print(row)
 }
 
-// for-in loops are not supported because Swift's IteratorProtocol doesn't permit exceptions
+// Alternatively you can use a for-in loop. For-in loops iterate over 
+// Result<[String], Error>? as IteratorProtocol doesn't support exceptions.
+
+for result in reader {
+    switch result {
+    case let .success(row):
+        print(row)
+    case let .failure(error):
+        throw error
+    }
+}
+
 ```
 
 The CSVReader can be configured using constructor arguments directly or by passing
@@ -100,7 +111,7 @@ let conf = CSVReader.Configuration(
     // Otherwise an exception will be thrown.
     columnCount: .lax,
     
-    // The capacity of the reader buffer. You probably won't need to change this.
+    // The capacity of the reader buffer in bytes. You probably won't need to change this.
     bufferCapacity: 1024 * 1024
 )
 

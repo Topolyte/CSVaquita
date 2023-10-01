@@ -59,7 +59,7 @@ public enum CSVReaderError: Error {
 }
 
 
-public class CSVReader {
+public class CSVReader: Sequence, IteratorProtocol {
     let stream: BufferedStream
     let delimiter: UInt8
     let header: Header
@@ -145,6 +145,16 @@ public class CSVReader {
         ))
     }
 
+    public func next() -> Result<[String], Error>? {
+        do {
+            if let row = try readRow() {
+                return .success(row)
+            }
+            return nil
+        } catch {
+            return .failure(error)
+        }
+    }
         
     public func readRow() throws -> [String]? {
         try skipNoOpLines()
