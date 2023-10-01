@@ -48,7 +48,7 @@ let stream = InputStream(data: csv.data(using: .utf8)!)
 // If you pass the stream to the CSVReader constructor unopened, the stream will be opened automatically
 // and closed when the CSVReader itself is destroyed.
 
-let reader = CSVReader(stream)
+let reader = try CSVReader(stream)
 
 // Read rows as [String] until nil is returned
 
