@@ -320,7 +320,50 @@ func readAll(_ reader: CSVReader, printRow: Bool = false) throws -> [[String]] {
 }
 
 func makeStream(_ s: String) -> InputStream {
-    let stream = InputStream(data: s.data(using: .utf8)!)
-    stream.open()
-    return stream
+    return InputStream(data: s.data(using: .utf8)!)
+}
+
+func makeDefaultConf() throws -> CSVReader.Configuration {
+    let conf = CSVReader.Configuration(
+        // delimiter can be any ASCII character
+        delimiter: ",",
+        
+        // header is either .firstRow or .none. If .firstRow is chosen, the first significant
+        // (i.e non-empty and non-comment) row is stored in CSVReader.headerFields
+        // and will not be returned by readRow(). When choosing .none, all significant
+        // rows are returned by readRow() and CSVReader.headerFields will be an array
+        // containing the column indices of the first significant row: ["0", "1", "2", ... "n-1"]
+        header: .firstRow,
+        
+        // quoting can be either .none or .character(c) where c can be any ASCII character.
+        // Columns enclosed between quote characters can contain the delimiter character as well
+        // as line breaks. The quote character itself can be escaped by doubling it.
+        // If you don't use trimming, the initial quote character must not be preceded by
+        // whitespace or it will be considered part of the field content.
+        quoting: .character("\""),
+        
+        // commenting is either .none or .character(c) where c can be any ASCII character.
+        // Lines starting with c will be ignored.
+        commenting: .none,
+        
+        // trimming can be .none, .left, .right or .both removing space and tab from
+        // the beginning and/or end of a field
+        trimming: .none,
+        
+        // columnCount can be .lax, .strict or .exactly(n)
+        // .lax means that rows can have varying numbers of columns. CSVReader.headerFields
+        // always reflects the number of columns in the first row.
+        // Using .strict causes an exception to be thrown if a row doesn't have the same
+        // number of columns as the first row.
+        // .exactly(n) requires that all rows, including the first one, have exactly n columns.
+        // Otherwise an exception will be thrown.
+        columnCount: .lax,
+        
+        // The capacity of the reader buffer. You probably won't need to change this.
+        bufferCapacity: 1024 * 1024
+    )
+    
+    let reader = try CSVReader(makeStream(""), conf)
+    
+    return conf
 }

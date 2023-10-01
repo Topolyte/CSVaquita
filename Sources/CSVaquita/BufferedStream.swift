@@ -57,13 +57,7 @@ public final class BufferedStream {
         let n = stream.read(buf.baseAddress!, maxLength: buf.count)
         
         guard n > -1 else {
-            let status = " [\(stream.streamStatus)]"
-            
-            if let error = stream.streamError {
-                throw BufferedStreamError.io(String(describing: error) + status)
-            } else {
-                throw BufferedStreamError.io("Stream error: " + status)
-            }
+            throw makeStreamError(stream: self.stream)
         }
         
         end = n
@@ -73,3 +67,26 @@ public final class BufferedStream {
     }
 }
 
+func makeStreamError(stream: InputStream) -> BufferedStreamError {
+    let statusString = statusDescription(stream.streamStatus)
+    
+    if let error = stream.streamError {
+        return BufferedStreamError.io(String(describing: error) + " Status: \(statusString)")
+    } else {
+        return BufferedStreamError.io("Status: \(statusString)")
+    }
+}
+
+func statusDescription(_ status: Stream.Status) -> String {
+    switch status {
+    case .atEnd: return "atEnd"
+    case .closed: return "closed"
+    case .error: return "error"
+    case .notOpen: return "notOpen"
+    case .open: return "open"
+    case .opening: return "opening"
+    case .reading: return "reading"
+    case .writing: return "writing"
+    default: return "unknown"
+    }
+}

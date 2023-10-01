@@ -36,6 +36,7 @@ public enum CSVReaderError: Error {
     case io(String)
 }
 
+
 public class CSVReader {
     let stream: BufferedStream
     let delimiter: UInt8
@@ -45,43 +46,83 @@ public class CSVReader {
     let columnCount: ColumnCount
     let trimming: Trimming
     
+    public class Configuration {
+        public var delimiter: Character
+        public var header: Header
+        public var quoting: Quoting
+        public var commenting: Commenting
+        public var trimming: Trimming
+        public var columnCount: ColumnCount
+        public var bufferCapacity: Int
+        
+        public init(delimiter: Character = ",",
+                    header: Header = .firstRow,
+                    quoting: Quoting = .character("\""),
+                    commenting: Commenting = .none,
+                    trimming: Trimming = .none,
+                    columnCount: ColumnCount = .lax,
+                    bufferCapacity: Int = 1024 * 1024)
+        {
+            self.delimiter = delimiter
+            self.header = header
+            self.quoting = quoting
+            self.commenting = commenting
+            self.trimming = trimming
+            self.columnCount = columnCount
+            self.bufferCapacity = bufferCapacity
+        }
+    }
+    
     public var headerFields = [String]()
     var firstRowColumnCount = 0
     var line = 1
     var row = 0
     var stringBuffer = ContiguousArray<UInt8>()
     
-    public init(_ stream: InputStream,
-                delimiter: Character = ",",
-                header: Header = .firstRow,
-                quoting: Quoting = .character("\""),
-                commenting: Commenting = .none,
-                trimming: Trimming = .none,
-                columnCount: ColumnCount = .lax,
-                bufferCapacity: Int = 1024 * 1024) throws
-    {
-        self.delimiter = try requireAscii(delimiter,
+    public init(_ stream: InputStream, _ conf: Configuration = Configuration()) throws {
+        self.delimiter = try requireAscii(conf.delimiter,
             errorMessage: "The delimiter must be within the ASCII range")
         
-        self.header = header
-        self.columnCount = columnCount
-        self.trimming = trimming
-        self.stream = BufferedStream(stream, bufferCapacity: bufferCapacity)
+        self.header = conf.header
+        self.columnCount = conf.columnCount
+        self.trimming = conf.trimming
+        self.stream = BufferedStream(stream, bufferCapacity: conf.bufferCapacity)
         
-        if case let .character(c) = quoting {
+        if case let .character(c) = conf.quoting {
             self.quote = try requireAscii(c,
                 errorMessage: "The quote character must be within the ASCII range")
         } else {
             self.quote = nil
         }
         
-        if case let .character(c) = commenting {
+        if case let .character(c) = conf.commenting {
             self.comment = try requireAscii(c,
                 errorMessage: "The comment character must be within the ASCII range")
         } else {
             self.comment = nil
         }
     }
+    
+    public convenience init(_ stream: InputStream,
+        delimiter: Character = ",",
+        header: Header = .firstRow,
+        quoting: Quoting = .character("\""),
+        commenting: Commenting = .none,
+        trimming: Trimming = .none,
+        columnCount: ColumnCount = .lax,
+        bufferCapacity: Int = 1024 * 1024) throws
+    {
+        try self.init(stream, Configuration(
+            delimiter: delimiter,
+            header: header,
+            quoting: quoting,
+            commenting: commenting,
+            trimming: trimming,
+            columnCount: columnCount,
+            bufferCapacity: bufferCapacity
+        ))
+    }
+
         
     public func readRow() throws -> [String]? {
         try skipNoOpLines()
