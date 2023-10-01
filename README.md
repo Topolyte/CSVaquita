@@ -60,7 +60,7 @@ while let row = try reader.readRow() {
 ```
 
 The CSVReader can be configured using constructor arguments directly or by passing
-a CSVReaderConfiguration object to the constructor. Configuration objects can be reused
+a CSVReader.Configuration object to the constructor. Configuration objects can be reused
 as well as modified to create multiple readers.
 
 ```
