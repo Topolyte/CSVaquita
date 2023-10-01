@@ -257,6 +257,41 @@ final class csvaquitaTests: XCTestCase {
         XCTAssertEqual(expected, rows)
     }
 
+    func testOneColumnTrimmed() throws {
+        let s = """
+        1
+        "United Kingdom"
+         2
+         United States
+        3
+        """
+        
+        let reader = try CSVReader(
+            makeStream(s),
+            header: .none,
+            trimming: .both)
+
+        let expected = [
+            ["1"],
+            ["United Kingdom"],
+            ["2"],
+            ["United States"],
+            ["3"]
+        ]
+        
+        let rows = try readAll(reader)
+        
+        XCTAssertEqual(expected, rows)
+    }
+
+    func testEmptyInput() throws {
+        let reader = try CSVReader(makeStream(""))
+        let expected = [[String]]()
+        
+        let rows = try readAll(reader)
+        XCTAssertEqual(expected, rows)
+    }
+
     func testAdHoc() throws {
         let s = """
         one,two
