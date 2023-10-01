@@ -56,7 +56,7 @@ while let row = try reader.readRow() {
     print(row)
 }
 
-// for-in loop is not supported because Swift's IteratorProtocol doesn't permit exceptions
+// for-in loops are not supported because Swift's IteratorProtocol doesn't permit exceptions
 ```
 
 The CSVReader can be configured using constructor arguments directly or by passing
