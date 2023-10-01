@@ -185,7 +185,7 @@ public class CSVReader {
                         stream.pushback()
                         break
                     } else if c == Ascii.lf {
-                        line += 1
+                        stream.pushback()
                         break
                     } else if isLineSpace(c) {
                         try skipLineSpace()
@@ -209,11 +209,7 @@ public class CSVReader {
     
     func readUnquotedField() throws -> String? {
         while let c = try stream.readByte() {
-            if c == Ascii.lf {
-                line += 1
-                stream.pushback()
-                break
-            } else if c == delimiter {
+            if c == delimiter || c == Ascii.lf {
                 stream.pushback()
                 break
             } else if c != Ascii.cr {

@@ -9,14 +9,29 @@ final class csvaquitaTests: XCTestCase {
         2,United States,Washington,338289857,
         """
         
-        let reader = try CSVReader(makeStream(s), columnCount: .exactly(5))
-        _ = try readAll(reader)
+        let reader = try CSVReader(
+            makeStream(s),
+            header: .firstRow,
+            columnCount: .exactly(5)
+        )
+        
+        let expected = [
+            ["1","United Kindom","London","67508936","$3158bn"],
+            ["2","United States","Washington","338289857",""]
+        ]
+        
+        let headers = ["id","country","capital","population","GDP"]
+        
+        let rows = try readAll(reader)
+        
+        XCTAssertEqual(expected, rows)
+        XCTAssertEqual(headers, reader.headerFields)
     }
     
     func testQuoted() throws {
         let s = """
-        1,United Kindom,"\"\"London\"\"","67,508,936",$3158bn
-        2,United States,Washington,"338,289,857",
+        "1","United Kindom","\"\"London\"\"","67,508,936","$3158bn"
+        "2","United States","Washington","338,289,857",""
         """
         
         let reader = try CSVReader(
@@ -209,6 +224,32 @@ final class csvaquitaTests: XCTestCase {
         let expected = [
             ["1","United Kindom",""," ","$3158bn"],
             ["","United States","Washington","",""]
+        ]
+        
+        let rows = try readAll(reader)
+        
+        XCTAssertEqual(expected, rows)
+    }
+
+    func testOneColumn() throws {
+        let s = """
+        1
+        "United Kingdom"
+         2
+         United States
+        3
+        """
+        
+        let reader = try CSVReader(
+            makeStream(s),
+            header: .none)
+
+        let expected = [
+            ["1"],
+            ["United Kingdom"],
+            [" 2"],
+            [" United States"],
+            ["3"]
         ]
         
         let rows = try readAll(reader)
