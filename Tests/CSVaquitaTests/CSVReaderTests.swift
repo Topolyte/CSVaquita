@@ -391,7 +391,7 @@ func makeDefaultConf() throws -> CSVReader.Configuration {
         bufferCapacity: 1024 * 1024
     )
     
-    let reader = try CSVReader(makeStream(""), conf)
+    let _ = try CSVReader(makeStream(""), conf)
     
     return conf
 }

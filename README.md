@@ -13,9 +13,7 @@ let package = Package(
         .package(url: "https://github.com/Topolyte/CSVaquita.git", from: "1.0.0")
     ],
     targets: [
-        .executableTarget(name: "<your target>", dependencies: [
-            .product(name: "CSVaquita", package: "https://github.com/Topolyte/CSVaquita.git"),
-        ])
+        .executableTarget(name: "<your target>", dependencies: ["CSVaquita"])
     ]
 )
 ``` 
