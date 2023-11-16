@@ -319,14 +319,20 @@ final class csvaquitaTests: XCTestCase {
 
         XCTAssertEqual(expected, rows)
     }
+    
+    func testBOM() throws {
+        let s = "\u{FEFF}abc"
+        let reader = try CSVReader(makeStream(s), header: .none)
+        if let row = try reader.readRow() {
+            XCTAssertEqual("abc", row[0])
+        } else {
+            XCTFail("No rows read")
+        }
+    }
 
     func testAdHoc() throws {
-        let s = """
-        one,two
-        "abc",xyz
-        """
-        
-        let rdr = try CSVReader(makeStream(s))
+        let s = "\u{FEFF}abc"
+        let rdr = try CSVReader(makeStream(s), header: .none)
         while let row = try rdr.readRow() {
             print("\(row)")
         }

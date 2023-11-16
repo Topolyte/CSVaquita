@@ -73,7 +73,7 @@ public final class BufferedStream {
         let available = min(n, end - pos)
         if available > 0 {
             pos += available
-            return Array(buf[pos..<(pos + available)])
+            return Array(buf[(pos - available)..<pos])
         }
         return []
     }
