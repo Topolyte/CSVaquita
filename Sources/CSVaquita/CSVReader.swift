@@ -323,7 +323,7 @@ public class CSVReader: Sequence, IteratorProtocol {
         }
     }
     
-    let bom: [UInt8] = [0xFE, 0xBB, 0xBF]
+    let bom: [UInt8] = [0xEF, 0xBB, 0xBF]
     
     func skipBOM() throws {
         let bytes = try stream.readBytes(3)
