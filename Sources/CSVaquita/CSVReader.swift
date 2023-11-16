@@ -186,7 +186,6 @@ public class CSVReader: Sequence, IteratorProtocol {
         }
         
         var expectedColumnCount: Int
-        
         switch self.columnCount {
         case .lax:
             expectedColumnCount = fields.count
