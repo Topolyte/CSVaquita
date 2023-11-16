@@ -66,12 +66,27 @@ public final class BufferedStream {
         return buf[pos - 1]
     }
     
-    public func pushback() {
-        guard pos > 0 else {
+    public func readBytes(_ n: Int) throws -> [UInt8] {
+        if pos == end {
+            try readStream()
+        }
+        let available = min(n, end - pos)
+        if available > 0 {
+            pos += available
+            return Array(buf[pos..<(pos + available)])
+        }
+        return []
+    }
+    
+    public func pushback(_ n: Int = 1) {
+        if n < 1 {
             return
         }
-        
-        pos -= 1
+        if pos > n {
+            pos -= n
+        } else {
+            pos = 0
+        }
     }
 
     @discardableResult

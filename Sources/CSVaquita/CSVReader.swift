@@ -123,6 +123,8 @@ public class CSVReader: Sequence, IteratorProtocol {
         } else {
             self.comment = nil
         }
+        
+        try skipBOM()
     }
     
     public convenience init(_ stream: InputStream,
@@ -320,6 +322,16 @@ public class CSVReader: Sequence, IteratorProtocol {
                 break
             }
         }
+    }
+    
+    let bom: [UInt8] = [0xFE, 0xBB, 0xBF]
+    
+    func skipBOM() throws {
+        let bytes = try stream.readBytes(3)
+        if bom == bytes {
+            return
+        }
+        stream.pushback(bytes.count)
     }
     
     func nextLine() throws {
